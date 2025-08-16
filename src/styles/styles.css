@@ -1,0 +1,38 @@
+body{
+    font-family: 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
+}
+
+#title-logo {
+    max-width: 20%;
+    height: auto;
+}
+
+#title {
+    font-family: 'Segoe Print', 'Bradley Hand', Chilanka, TSCu_Comic, casual, cursive;
+    font-weight: bold;
+    color: darkcyan;
+}
+
+.todo-column {
+    min-height: 70vh; /* Adjusts with screen height */
+    max-width: 40%;
+    margin-left: 2%;
+    margin-bottom: 1%;
+    margin-top: 1%;
+    background: #f4f6fa;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(60, 60, 60, 0.08);
+    padding: 24px 18px;
+}
+
+.pending-tasks-title
+{
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #253858;
+    margin-bottom: 18px;
+}
