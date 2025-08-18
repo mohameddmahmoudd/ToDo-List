@@ -23,6 +23,12 @@
             <div class="col-6">
             <div class="todo-column border rounded-3 shadow p-4 bg-white">
                 <h5 class="text-center pending-tasks-title">Pending Tasks</h5>
+                <div class="input-group mb-2">
+                    <input type="text" id="pending-search" class="form-control" placeholder="Search pending tasks">
+                    <button type="button" class="btn" id="pending-search-btn">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
                 <form id="todo-form">
                     <div class="input-group mb-3">
                         <input type="text" id="todo-input" class="form-control" placeholder="Add a new task" required>
@@ -35,9 +41,16 @@
             </div>
             </div>
             
+            
             <div class="col-6">
                 <div class="todo-column border rounded-3 shadow p-4 bg-white">
                     <h5 class="text-center completed-tasks-title">Completed Tasks</h5>
+                    <div class="input-group mb-2">
+                        <input type="text" id="completed-search" class="form-control" placeholder="Search completed tasks">
+                        <button type="button" class="btn" id="completed-search-btn">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
                     <ul id="completed-tasks" class="list-group mt-3"></ul>
                 </div>
             </div>

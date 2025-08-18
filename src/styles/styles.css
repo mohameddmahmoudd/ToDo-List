@@ -42,3 +42,7 @@ body{
     color: #28a745;
     margin-bottom: 18px;
 }
+
+#completed-tasks {
+    min-height: 200px;
+}
