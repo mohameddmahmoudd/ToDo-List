@@ -5,7 +5,7 @@ const pendingSearch = document.getElementById('pending-search');
 const pendingSearchBtn = document.getElementById('pending-search-btn');
 const completedSearch = document.getElementById('completed-search');
 const completedSearchBtn = document.getElementById('completed-search-btn');
-
+let tasks = []; 
 
 todoForm.onsubmit = function(event) {
     event.preventDefault(); /*prevent reloading*/
@@ -19,24 +19,54 @@ todoForm.onsubmit = function(event) {
 
 function addTask(taskText) {
     const li = document.createElement('li');
+    const taskObj = { title: taskText, completed: false,};
+        fetch('/api/todos', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(taskObj)
+    }).then(res => res.json()).then(data => {
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.textContent = taskText;
+        li.setAttribute('draggable', 'true');
+        li.addEventListener('dragstart', handleDragStart);
+        pendingTasksList.appendChild(li);
+
+        /*Adding an id (returned from mongo) to each task*/
+        const newTaskObj = { id: data.id, title: taskText, completed: false };
+        tasks.push(newTaskObj);
+        li.dataset.id = data.id; /* Store the ID from the server */
+    });
+};
+
+function addTasksOnReload(task)
+{
+    const li = document.createElement('li');
     li.className = 'list-group-item d-flex justify-content-between align-items-center';
-    li.textContent = taskText;
+    li.textContent = task.title;
     li.setAttribute('draggable', 'true');
     li.addEventListener('dragstart', handleDragStart);
-    pendingTasksList.appendChild(li);
+    li.dataset.id = task.id
+
+    if(task.completed)
+    {
+        completedTasksList.appendChild(li);
+    }
+    else
+    {
+        pendingTasksList.appendChild(li);
+    }
 }
-
-
 /***************Drag and Drop Handlers***************/
-let draggedTask = null;
+let draggedTask = { id: null, title: '', completed: false };
 
 function handleDragStart(e) {
-    draggedTask = e.target.closest("li");
-
-    if (!draggedTask) return;
-    e.dataTransfer.setData('text/plain', e.target.textContent);
+    const li = e.target.closest("li");
+    if (!li) return;
+    draggedTask.id = li.dataset.id;
+    draggedTask.title = li.textContent;
+    e.dataTransfer.setData('text/plain', draggedTask.title);
     e.dataTransfer.effectAllowed = 'move';
-    draggedTask.classList.add("dragging");
+    li.classList.add("dragging");
 }
 
 completedTasksList.addEventListener('dragover', function(e) {
@@ -49,16 +79,21 @@ completedTasksList.addEventListener('dragleave', () => completedTasksList.classL
 
 completedTasksList.addEventListener('drop', function(e) {
     e.preventDefault();
-    if (draggedTask) {
-        // Remove from pending
-        pendingTasksList.removeChild(draggedTask);
-        completedTasksList.classList.remove("dragover");
-        // Add to completed
-        const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center';
-        li.textContent = draggedTask.textContent;
-        completedTasksList.appendChild(li);
-        draggedTask = null;
+    if (draggedTask.id) {
+        // Find the <li> element in pendingTasksList by data-id
+        const li = pendingTasksList.querySelector(`li[data-id="${draggedTask.id}"]`);
+        if (li) {
+            pendingTasksList.removeChild(li);
+            completedTasksList.appendChild(li);
+        }
+
+        // Find the task object in the array
+        const idx = tasks.findIndex(t => t.id == draggedTask.id);
+        if (idx !== -1) {
+            tasks[idx].completed = true;
+            markTaskCompleted(tasks[idx].id);
+        }
+        draggedTask = { id: null, title: '', completed: false };
     }
 });
 
@@ -111,3 +146,35 @@ completedSearchBtn.onclick = function(e) {
         }   
     }
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('/api/todos')
+        .then(res => res.json())
+        .then(data => {
+            tasks = data.map(task => ({
+                id: task.id,
+                title: task.title,
+                completed: task.completed
+            }));
+            data.forEach(task => {
+                addTasksOnReload({ 
+                    id: task._id, 
+                    title: task.title, 
+                    completed: task.completed 
+                });
+            });
+        });
+});
+
+function markTaskCompleted(taskID)
+{
+    fetch(`/api/todos/${taskID}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ completed: true })
+    })
+    .catch(error => {
+        console.error('Error marking task as completed:', error);
+    });
+}
+
