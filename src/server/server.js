@@ -114,12 +114,6 @@ app.put('/api/todos/:id', async (req, res) => {
     const { id } = req.params;
     const updates = req.body;
 
-    // Validate the incoming data
-    const errors = validateTodoPayload(updates);
-    if (errors.length > 0) {
-        return res.status(400).json({ errors });
-    }
-
     try {
         const result = await collection.updateOne({ _id: new ObjectId(id) }, { $set: updates });
         if (result.modifiedCount === 0) {

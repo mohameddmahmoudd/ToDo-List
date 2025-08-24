@@ -45,7 +45,7 @@ function addTasksOnReload(task)
     li.textContent = task.title;
     li.setAttribute('draggable', 'true');
     li.addEventListener('dragstart', handleDragStart);
-    li.dataset.id = task.id
+    li.dataset.id = task.id;
 
     if(task.completed)
     {
@@ -55,6 +55,7 @@ function addTasksOnReload(task)
     {
         pendingTasksList.appendChild(li);
     }
+    console.log("Task added:", task);
 }
 /***************Drag and Drop Handlers***************/
 let draggedTask = { id: null, title: '', completed: false };
@@ -152,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(res => res.json())
         .then(data => {
             tasks = data.map(task => ({
-                id: task.id,
+                id: task._id,
                 title: task.title,
                 completed: task.completed
             }));
